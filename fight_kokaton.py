@@ -197,7 +197,7 @@ def main():
                 beams.append(Beam(bird))            
         screen.blit(bg_img, [0, 0])
         
-        new_beams = []
+        new_beams = [] # ビームを貯めておくリスト
         for beam in beams:
             beam.update(screen)
             new_beams.append(beam)
