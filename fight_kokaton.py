@@ -149,6 +149,7 @@ def main():
     beam = None
     clock = pg.time.Clock()
     tmr = 0
+
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -158,7 +159,7 @@ def main():
                 beam = Beam(bird)            
         screen.blit(bg_img, [0, 0])
         
-        
+        #衝突判定：こうかとんと爆弾
         if bomb is not None and bird.rct.colliderect(bomb.rct):
             # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
             bird.change_img(8, screen)
@@ -175,10 +176,13 @@ def main():
         if bomb is not None:
             bomb.update(screen)
 
+        #衝突判定：ビームと爆弾
         if beam is not None and bomb is not None:
             if beam.rct.colliderect(bomb.rct):
                 beam = None
                 bomb = None
+                bird.change_img(6, screen)
+
         pg.display.update()
         tmr += 1
         clock.tick(50)
