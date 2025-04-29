@@ -160,7 +160,7 @@ def main():
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)] # 爆弾リスト
-    beam = None
+    beams = [] # ビームリスト
     score = Score()
     clock = pg.time.Clock()
     tmr = 0
@@ -171,9 +171,15 @@ def main():
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 # スペースキー押下でBeamクラスのインスタンス生成
-                beam = Beam(bird)            
+                beams.append(Beam(bird))            
         screen.blit(bg_img, [0, 0])
         
+        new_beams = []
+        for beam in beams:
+            beam.update(screen)
+            new_beams.append(beam)
+        beams = new_beams
+
         # 衝突判定：こうかとんと爆弾
         for bomb in bombs:
             if bomb is not None and bird.rct.colliderect(bomb.rct):
@@ -187,24 +193,22 @@ def main():
                 return
 
         key_lst = pg.key.get_pressed()
-        bird.update(key_lst, screen)
-
-        if beam is not None:
-            beam.update(screen)  
-
+        bird.update(key_lst, screen) 
 
         # 衝突判定：ビームと爆弾
         for i, bomb in enumerate(bombs):
-            if beam is not None and bomb is not None:
-                if beam.rct.colliderect(bomb.rct):
-                    beam = None
-                    bombs[i] = None
-                    bird.change_img(6, screen)
-                    score.score += 1
+            for j, beam in enumerate(beams):
+                if beam is not None and bomb is not None:
+                    if beam.rct.colliderect(bomb.rct):
+                        beams[j] = None
+                        bombs[i] = None
+                        bird.change_img(6, screen)
+                        score.score += 1
         
         # 爆弾リストを更新（生き残ってる爆弾だけ残す）
         bombs = [bomb for bomb in bombs if bomb is not None]
-
+        beams = [beam for beam in beams if beam is not None]
+        
         # 爆弾を動かす
         for bomb in bombs:
             bomb.update(screen)
